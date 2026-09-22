@@ -70,6 +70,7 @@ build.bat release    + ProGuard: сжатие и обфускация (прим�
 ```
 dist/versions/MDReader-0.1.0.jar + .jad
 dist/versions/MDReader-0.1.1.jar + .jad
+dist/versions/MDReader-0.1.2.jar + .jad
 ```
 
 У архивной пары `.jad` ссылается на свой `.jar` по имени с версией, поэтому любую
