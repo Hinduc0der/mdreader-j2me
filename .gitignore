@@ -3,6 +3,8 @@ build/
 
 # Текущая сборка: перезаписывается каждым build.bat.
 # Готовые версии лежат в dist/versions/ и в репозиторий попадают.
+dist/MDReader.jar
+dist/MDReader.jad
 dist/MDReader-*.jar
 dist/MDReader-*.jad
 
