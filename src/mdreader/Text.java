@@ -11,7 +11,8 @@ public final class Text {
     public static final int ENC_CP1251 = 2;
     public static final int ENC_LATIN1 = 3;
 
-    public static final String[] ENC_NAMES = { "Авто", "UTF-8", "Windows-1251", "Latin-1" };
+    // Названия кодировок переехали в Strings.ENC_NAMES: они видны пользователю,
+    // а значит зависят от языка сборки. Порядок обязан совпадать с ENC_* выше.
 
     /** Верхняя половина CP1251 (0x80..0xFF). */
     private static final String CP1251_HIGH =

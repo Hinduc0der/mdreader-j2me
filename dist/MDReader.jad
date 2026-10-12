@@ -1,0 +1,8 @@
+MIDlet-Name: MDReader
+MIDlet-Version: 0.1.2
+MIDlet-Vendor: hinducoder
+MIDlet-1: MD Reader,/icon.png,mdreader.MDReaderMIDlet
+MicroEdition-Configuration: CLDC-1.1
+MicroEdition-Profile: MIDP-2.0
+MIDlet-Jar-URL: MDReader.jar
+MIDlet-Jar-Size: 19988

@@ -30,7 +30,7 @@ public class Book {
         this.enc = enc;
         fc = (FileConnection) Connector.open(url, Connector.READ);
         if (!fc.exists()) {
-            throw new IOException("Файл не найден");
+            throw new IOException(Strings.FILE_NOT_FOUND);
         }
         size = fc.fileSize();
         fill(0);

@@ -10,11 +10,14 @@ card and renders the markup itself. Targets the Nokia 5300 (240x320), Sony Erics
 (176x220) and anything else with Java and JSR-75. Layout is derived from the screen size,
 so there are no per-resolution builds.
 
-Ready-to-install build: `dist/MDReader.jar` + `dist/MDReader.jad`.
+The interface comes in two languages, as two separate builds:
+`dist/MDReader-en.jar` + `.jad` and `dist/MDReader-ru.jar` + `.jad`.
+Every released version of both is kept in `dist/versions/`.
 
 ## Installing on a phone
 
-1. Copy **both** files, the `.jar` and the `.jad`, into the same folder on the memory card.
+1. Pick your language and copy **both** files of that build, the `.jar` and the `.jad`,
+   into the same folder on the memory card.
 2. On the phone, open the `.jad` (on S40 — via *Gallery* / *Applications*) and accept the install.
 3. The first time you open a file the phone will ask for permission to access data —
    that is JSR-75. To stop it asking every time, set the application permission
@@ -62,17 +65,19 @@ You need JDK 8, WTK 2.5.2 and, for a release build, ProGuard. Paths are set at t
 of `build.bat`.
 
 ```
-build.bat            plain build, classes as they are
-build.bat release    + ProGuard: shrinking and obfuscation (roughly half the JAR size)
+build.bat                plain build, Russian, for the emulator
+build.bat en             plain build, English
+build.bat release        release of BOTH languages + version archive
+build.bat release en     release of one language only
 ```
 
-The output is `dist/MDReader.jar` and `.jad` — always the latest build, overwritten every
-time. On top of that, every **release** build is archived:
+The output is `dist/MDReader-<lang>.jar` and `.jad` — always the latest build, overwritten
+every time. On top of that, every **release** build is archived:
 
 ```
-dist/versions/MDReader-0.1.0.jar + .jad
-dist/versions/MDReader-0.1.1.jar + .jad
-dist/versions/MDReader-0.1.2.jar + .jad
+dist/versions/MDReader-0.1.2.jar        + .jad    (up to 0.1.2 — Russian only)
+dist/versions/MDReader-0.2.0-ru.jar    + .jad
+dist/versions/MDReader-0.2.0-en.jar    + .jad
 ```
 
 In an archived pair the `.jad` points at its own versioned `.jar`, so any old version can
@@ -111,6 +116,7 @@ Be warned: the emulator uses desktop Windows fonts and lies about memory. Two bu
 | `MdParser` / `MdBlock` | a Markdown line → a block with per-character styles |
 | `ReaderCanvas` | wrapping to screen width, drawing, keys, auto-scroll |
 | `Settings` | RMS: settings and reading positions |
+| `Strings` | every string the user sees; one copy per language in `i18n/<lang>/` |
 
 The file is never read into memory as a whole: a page is identified by a pair of
 «line offset + visual line number inside it», and `Book` keeps an 8 KB window. On a K750
@@ -122,6 +128,20 @@ with its one megabyte of heap that is not optional.
 javac -d build\test src\mdreader\Roots.java test\RootsTest.java
 java -cp build\test RootsTest
 ```
+
+## Interface language
+
+CLDC 1.1 has no resource bundles, so the language is chosen at build time: `build.bat`
+hands javac the `Strings.java` for the language being built, out of `i18n/ru/` or
+`i18n/en/`. Every user-visible string is a `static final` field there, which means
+ProGuard inlines them and the class disappears from the JAR — the English build carries
+no Russian text and vice versa.
+
+Both files must declare the same set of fields. If one language is missing a string, that
+language simply fails to compile, which is exactly the check we want.
+
+To add a language, copy `i18n/en/mdreader/Strings.java` to `i18n/<code>/mdreader/`,
+translate the values, and run `build.bat release <code>`.
 
 ## Licence
 

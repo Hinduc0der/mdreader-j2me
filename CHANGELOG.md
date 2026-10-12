@@ -12,6 +12,23 @@ noticeable new capability.
 
 ---
 
+## 0.2.0 — 2026-10-12
+
+**The interface is now available in English.**
+
+- Every user-visible string moved into a `Strings` class, one file per language in
+  `i18n/ru/` and `i18n/en/`. The language is chosen at build time, so each JAR carries
+  only its own language and nothing is wasted on the device.
+- `build.bat` now builds both languages: `build.bat release` produces a Russian and an
+  English release and archives both. A single language can be built with
+  `build.bat release en`.
+- Build artefacts are renamed accordingly: `MDReader-ru.jar` / `MDReader-en.jar`, and in
+  the archive `MDReader-<version>-<lang>.jar` with a matching `.jad`.
+- Documentation (README, CHANGELOG, PLAN) is now bilingual, English first.
+
+Both builds share the same MIDlet identity, so installing one replaces the other and the
+saved reading positions carry over. Nothing else about the reader changed in this version.
+
 ## 0.1.2 — 2026-09-22
 
 - The About screen now links to the source: `github.com/Hinduc0der/mdreader-j2me`.

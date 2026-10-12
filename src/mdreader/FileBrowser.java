@@ -21,17 +21,17 @@ public class FileBrowser extends List implements CommandListener {
 
     private final MDReaderMIDlet midlet;
     private final Settings settings;
-    private final Command cmdOpen = new Command("Открыть", Command.ITEM, 1);
-    private final Command cmdUp = new Command("Вверх", Command.BACK, 2);
-    private final Command cmdAllRoots = new Command("Все диски", Command.SCREEN, 5);
-    private final Command cmdFewRoots = new Command("Объединить диски", Command.SCREEN, 5);
-    private final Command cmdExit = new Command("Выход", Command.EXIT, 9);
+    private final Command cmdOpen = new Command(Strings.OPEN, Command.ITEM, 1);
+    private final Command cmdUp = new Command(Strings.UP, Command.BACK, 2);
+    private final Command cmdAllRoots = new Command(Strings.ALL_DRIVES, Command.SCREEN, 5);
+    private final Command cmdFewRoots = new Command(Strings.MERGE_DRIVES, Command.SCREEN, 5);
+    private final Command cmdExit = new Command(Strings.EXIT, Command.EXIT, 9);
 
     private String dir;
     private Vector entries = new Vector();
 
     public FileBrowser(MDReaderMIDlet midlet, Settings settings, String startDir) {
-        super("Выбор файла", List.IMPLICIT);
+        super(Strings.CHOOSE_FILE, List.IMPLICIT);
         this.midlet = midlet;
         this.settings = settings;
         addCommand(cmdOpen);
@@ -52,17 +52,17 @@ public class FileBrowser extends List implements CommandListener {
         entries.removeAllElements();
 
         if (path == null || path.length() == 0) {
-            setTitle("Память телефона");
+            setTitle(Strings.PHONE_MEMORY);
             removeCommand(cmdAllRoots);
             removeCommand(cmdFewRoots);
             addCommand(showAllRoots() ? cmdFewRoots : cmdAllRoots);
             try {
                 showRoots();
             } catch (Exception e) {
-                append("Нет доступа к файлам", null);
+                append(Strings.NO_FILE_ACCESS, null);
             }
             if (entries.isEmpty()) {
-                append("Корней не найдено", null);
+                append(Strings.NO_ROOTS, null);
             }
             return;
         }
@@ -95,10 +95,10 @@ public class FileBrowser extends List implements CommandListener {
                 append(name, null);
             }
             if (entries.isEmpty()) {
-                append("(пусто)", null);
+                append(Strings.EMPTY_DIR, null);
             }
         } catch (Exception ex) {
-            append("Нет доступа: " + ex.getMessage(), null);
+            append(Strings.NO_ACCESS + ex.getMessage(), null);
         } finally {
             try {
                 if (fc != null) {

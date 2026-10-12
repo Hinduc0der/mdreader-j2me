@@ -34,8 +34,8 @@ public class MDReaderMIDlet extends MIDlet implements CommandListener {
     private ChoiceGroup cgEnc;
     private ChoiceGroup cgView;
 
-    private final Command cmdBack = new Command("Назад", Command.BACK, 2);
-    private final Command cmdOk = new Command("OK", Command.OK, 1);
+    private final Command cmdBack = new Command(Strings.BACK, Command.BACK, 2);
+    private final Command cmdOk = new Command(Strings.OK, Command.OK, 1);
 
     protected void startApp() {
         if (display == null) {
@@ -97,7 +97,7 @@ public class MDReaderMIDlet extends MIDlet implements CommandListener {
             display.setCurrent(reader);
             return true;
         } catch (Throwable t) {
-            error("Не удалось открыть файл: " + t.getMessage());
+            error(Strings.OPEN_FAILED + t.getMessage());
             return false;
         }
     }
@@ -122,7 +122,7 @@ public class MDReaderMIDlet extends MIDlet implements CommandListener {
     }
 
     private void error(String msg) {
-        Alert a = new Alert("Ошибка", msg, null, AlertType.ERROR);
+        Alert a = new Alert(Strings.ERROR, msg, null, AlertType.ERROR);
         a.setTimeout(3000);
         display.setCurrent(a, browser != null ? (Displayable) browser : (Displayable) reader);
     }
@@ -131,15 +131,15 @@ public class MDReaderMIDlet extends MIDlet implements CommandListener {
 
     public void showMenu() {
         reader.stopAutoScroll();
-        menu = new List("Меню", List.IMPLICIT);
-        menu.append("Продолжить чтение", null);
-        menu.append("Содержание", null);
-        menu.append("Перейти к %", null);
-        menu.append("Открыть другой файл", null);
-        menu.append("Настройки", null);
-        menu.append("Автопрокрутка", null);
-        menu.append("О программе", null);
-        menu.append("Выход", null);
+        menu = new List(Strings.MENU, List.IMPLICIT);
+        menu.append(Strings.RESUME, null);
+        menu.append(Strings.CONTENTS, null);
+        menu.append(Strings.GOTO_PERCENT, null);
+        menu.append(Strings.OPEN_OTHER, null);
+        menu.append(Strings.SETTINGS, null);
+        menu.append(Strings.AUTOSCROLL, null);
+        menu.append(Strings.ABOUT, null);
+        menu.append(Strings.EXIT, null);
         menu.addCommand(cmdBack);
         menu.setCommandListener(this);
         display.setCurrent(menu);
@@ -148,10 +148,10 @@ public class MDReaderMIDlet extends MIDlet implements CommandListener {
     private void showToc() {
         Vector h = reader.headings();
         if (h.isEmpty()) {
-            error("Заголовков в файле нет");
+            error(Strings.NO_HEADINGS);
             return;
         }
-        toc = new List("Содержание", List.IMPLICIT);
+        toc = new List(Strings.CONTENTS, List.IMPLICIT);
         tocOffsets = new Vector();
         for (int i = 0; i < h.size(); i++) {
             Object[] pair = (Object[]) h.elementAt(i);
@@ -164,7 +164,7 @@ public class MDReaderMIDlet extends MIDlet implements CommandListener {
     }
 
     private void showGoto() {
-        gotoBox = new TextBox("Перейти к % (0-100)", String.valueOf(reader.book().percent(reader.position())), 3, TextField.NUMERIC);
+        gotoBox = new TextBox(Strings.GOTO_TITLE, String.valueOf(reader.book().percent(reader.position())), 3, TextField.NUMERIC);
         gotoBox.addCommand(cmdOk);
         gotoBox.addCommand(cmdBack);
         gotoBox.setCommandListener(this);
@@ -172,14 +172,14 @@ public class MDReaderMIDlet extends MIDlet implements CommandListener {
     }
 
     private void showSettings() {
-        settingsForm = new Form("Настройки");
-        cgFont = new ChoiceGroup("Шрифт", Choice.EXCLUSIVE, new String[] { "Мелкий", "Средний", "Крупный" }, null);
+        settingsForm = new Form(Strings.SETTINGS);
+        cgFont = new ChoiceGroup(Strings.FONT, Choice.EXCLUSIVE, Strings.FONT_SIZES, null);
         cgFont.setSelectedIndex(settings.fontSize, true);
-        cgScheme = new ChoiceGroup("Тема", Choice.EXCLUSIVE, new String[] { "День", "Ночь", "Сепия" }, null);
+        cgScheme = new ChoiceGroup(Strings.THEME, Choice.EXCLUSIVE, Strings.THEMES, null);
         cgScheme.setSelectedIndex(settings.scheme, true);
-        cgEnc = new ChoiceGroup("Кодировка", Choice.EXCLUSIVE, Text.ENC_NAMES, null);
+        cgEnc = new ChoiceGroup(Strings.ENCODING, Choice.EXCLUSIVE, Strings.ENC_NAMES, null);
         cgEnc.setSelectedIndex(settings.encoding, true);
-        cgView = new ChoiceGroup("Вид", Choice.MULTIPLE, new String[] { "Во весь экран", "Строка состояния", "Склеивать абзацы" }, null);
+        cgView = new ChoiceGroup(Strings.VIEW, Choice.MULTIPLE, Strings.VIEW_OPTIONS, null);
         cgView.setSelectedIndex(0, settings.fullScreen);
         cgView.setSelectedIndex(1, settings.showStatus);
         cgView.setSelectedIndex(2, settings.joinLines);
@@ -216,12 +216,12 @@ public class MDReaderMIDlet extends MIDlet implements CommandListener {
 
     private void showAbout() {
         Form f = new Form("MD Reader");
-        f.append("Читалка Markdown для телефонов на Java.\nВерсия " + version() + "\n\n");
-        f.append("Замысел и постановка задачи: hinducoder\nКод: Claude (Anthropic)\n\n");
+        f.append(Strings.ABOUT_DESC + version() + "\n\n");
+        f.append(Strings.ABOUT_CREDITS);
         if (HOMEPAGE.length() > 0) {
-            f.append("Исходники:\n" + HOMEPAGE + "\n\n");
+            f.append(Strings.ABOUT_SOURCE + HOMEPAGE + "\n\n");
         }
-        f.append("2 / 8 — строка\n7 / 9 — страница\n4 / 6 — глава\n5 — меню\n0 — автопрокрутка\n1 / 3 — скорость\n* — тема\n# — шрифт\n");
+        f.append(Strings.ABOUT_KEYS);
         f.addCommand(cmdBack);
         f.setCommandListener(this);
         display.setCurrent(f);

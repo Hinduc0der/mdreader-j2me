@@ -289,7 +289,7 @@ public class ReaderCanvas extends Canvas {
         if (book == null) {
             g.setColor(cFg);
             g.setFont(Font.getFont(Font.FACE_PROPORTIONAL, Font.STYLE_PLAIN, Font.SIZE_MEDIUM));
-            g.drawString("Книга не открыта", 4, 4, Graphics.TOP | Graphics.LEFT);
+            g.drawString(Strings.NO_BOOK, 4, 4, Graphics.TOP | Graphics.LEFT);
             return;
         }
 
@@ -298,7 +298,7 @@ public class ReaderCanvas extends Canvas {
             layout(g, pageOff, pageSkip, h - statusH, true);
         } catch (IOException e) {
             g.setColor(cFg);
-            g.drawString("Ошибка чтения", 4, 4, Graphics.TOP | Graphics.LEFT);
+            g.drawString(Strings.READ_ERROR, 4, 4, Graphics.TOP | Graphics.LEFT);
         }
 
         if (statusH > 0) {
@@ -483,14 +483,14 @@ public class ReaderCanvas extends Canvas {
         try {
             layout(null, pageOff, pageSkip, textBottom(), false);
             if (nextOff >= book.size() && nextSkip == 0) {
-                toast("Конец");
+                toast(Strings.END);
                 return;
             }
             pageOff = nextOff;
             pageSkip = nextSkip;
             repaint();
         } catch (IOException e) {
-            toast("Ошибка чтения");
+            toast(Strings.READ_ERROR);
         }
     }
 
@@ -506,7 +506,7 @@ public class ReaderCanvas extends Canvas {
             }
             repaint();
         } catch (IOException e) {
-            toast("Ошибка чтения");
+            toast(Strings.READ_ERROR);
         }
     }
 
@@ -523,7 +523,7 @@ public class ReaderCanvas extends Canvas {
                 pageSkip++;
             } else {
                 if (nx[0] >= book.size()) {
-                    toast("Конец");
+                    toast(Strings.END);
                     return;
                 }
                 pageOff = nx[0];
@@ -531,7 +531,7 @@ public class ReaderCanvas extends Canvas {
             }
             repaint();
         } catch (IOException e) {
-            toast("Ошибка чтения");
+            toast(Strings.READ_ERROR);
         }
     }
 
@@ -556,11 +556,11 @@ public class ReaderCanvas extends Canvas {
     public void lineUpPublic() {
         try {
             if (!lineUp()) {
-                toast("Начало");
+                toast(Strings.START);
             }
             repaint();
         } catch (IOException e) {
-            toast("Ошибка чтения");
+            toast(Strings.READ_ERROR);
         }
     }
 
@@ -581,9 +581,9 @@ public class ReaderCanvas extends Canvas {
                     return;
                 }
             }
-            toast(forward ? "Заголовков дальше нет" : "Заголовков выше нет");
+            toast(forward ? Strings.NO_HEADING_FWD : Strings.NO_HEADING_BACK);
         } catch (IOException e) {
-            toast("Ошибка чтения");
+            toast(Strings.READ_ERROR);
         }
     }
 
@@ -601,7 +601,7 @@ public class ReaderCanvas extends Canvas {
         try {
             gotoOffset(book.offsetForPercent(pct));
         } catch (IOException e) {
-            toast("Ошибка чтения");
+            toast(Strings.READ_ERROR);
         }
     }
 
@@ -639,10 +639,10 @@ public class ReaderCanvas extends Canvas {
     public void toggleAutoScroll() {
         if (autoScroll) {
             stopAutoScroll();
-            toast("Автопрокрутка выкл");
+            toast(Strings.AUTOSCROLL_OFF);
         } else {
             startAutoScroll();
-            toast("Автопрокрутка вкл");
+            toast(Strings.AUTOSCROLL_ON);
         }
     }
 
@@ -680,7 +680,7 @@ public class ReaderCanvas extends Canvas {
         if (autoScroll) {
             startAutoScroll();
         }
-        toast("Скорость: " + st.scrollDelay + " мс");
+        toast(Strings.SPEED + st.scrollDelay + Strings.MS);
     }
 
     // ------------------------------------------------------------------ клавиши
@@ -749,7 +749,8 @@ public class ReaderCanvas extends Canvas {
         if (key == Canvas.KEY_POUND) {
             st.fontSize = (st.fontSize + 1) % 3;
             applyScheme();
-            toast("Шрифт: " + (st.fontSize == 0 ? "мелкий" : st.fontSize == 1 ? "средний" : "крупный"));
+            toast(Strings.FONT_IS + (st.fontSize == 0 ? Strings.FONT_SMALL_LC
+                : st.fontSize == 1 ? Strings.FONT_MEDIUM_LC : Strings.FONT_LARGE_LC));
             return;
         }
         // левая/правая софт-клавиши на S40 и SE
