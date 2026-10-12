@@ -1,89 +1,98 @@
-# MD Reader — читалка Markdown для J2ME (MIDP 2.0 / CLDC 1.1)
+# MD Reader — a Markdown reader for J2ME (MIDP 2.0 / CLDC 1.1)
 
-Цель: читалка .md на кнопочных телефонах (Nokia 5300 — 240x320, SE K750 — 176x220,
-китайские "NOKLA" и прочие MIDP-2.0-аппараты). Дизайн и управление — в духе ReadManiac.
+**English** · [Русский](PLAN.ru.md)
 
-## Ограничения, из которых всё вытекает
+Goal: read `.md` files on feature phones (Nokia 5300 — 240x320, SE K750 — 176x220,
+the Chinese "NOKLA" clones and other MIDP 2.0 devices). Look and controls in the spirit
+of the old ReadManiac.
 
-- CLDC 1.1: нет generics, нет `StringBuilder` (только `StringBuffer`), нет коллекций
-  кроме `Vector`/`Hashtable`, нет `String.split`, нет `assert`, нет `enum`.
-  Компилируем `javac -source 1.3 -target 1.3` — компилятор сам не даст написать лишнего.
-- Куча на K750 ~1 МБ, на 5300 ~2 МБ. Файл целиком в память НЕ грузим.
-- Лимит на размер JAR у старых аппаратов (K750 — сотни КБ). ProGuard обязателен.
-- UTF-8 на части S40/SE конвертером не поддержан или врёт → свой декодер.
-- Файлы читаем через JSR-75 (FileConnection). Телефон будет спрашивать разрешение —
-  это нормально, снимается подписью MIDlet или настройкой прав приложения.
+## The constraints everything follows from
 
-## Архитектура
+- CLDC 1.1: no generics, no `StringBuilder` (only `StringBuffer`), no collections beyond
+  `Vector`/`Hashtable`, no `String.split`, no `assert`, no `enum`. We compile with
+  `javac -source 1.3 -target 1.3`, so the compiler itself rules out anything newer.
+- Heap is about 1 MB on a K750 and about 2 MB on a 5300. The file is never loaded whole.
+- Old devices cap the JAR size (hundreds of KB on a K750). ProGuard is mandatory.
+- On some S40/SE firmware UTF-8 is unsupported or simply wrong, hence a hand-written decoder.
+- Files are read over JSR-75 (FileConnection). The phone will ask for permission; that is
+  normal and is settled by signing the MIDlet or by the application's permission settings.
 
-| Класс | Что делает |
+## Architecture
+
+> The table below is the original plan, written before any code existed. Some classes
+> ended up named differently or merged into their neighbours. For how it is actually
+> built, see the "How the code is laid out" section in [README.md](README.md).
+
+| Class | Role |
 |---|---|
-| `MDReaderMIDlet` | запуск, восстановление последней книги, жизненный цикл |
-| `FileBrowser` | обзор карты памяти (JSR-75), фильтр `.md/.markdown/.txt`, «избранное» |
-| `BookIndex` | однопроходный скан файла: смещения абзацев в `int[]`, кэш в RMS |
-| `TextSource` | чтение куска файла по смещению + свой UTF-8/CP1251 декодер |
-| `MdParser` | строка → блок разметки (h1-h6, список, цитата, код, hr, текст) |
-| `Layout` | разбиение блока на строки по ширине экрана, стили через `Font` |
-| `ReaderCanvas` | полноэкранный рендер, управление клавишами, автопрокрутка |
-| `Settings` | RMS: шрифт, инверсия, кодировка, скорость автопрокрутки |
-| `Library` | RMS: позиция чтения и закладки по каждому файлу |
+| `MDReaderMIDlet` | startup, restoring the last book, lifecycle |
+| `FileBrowser` | memory-card browsing (JSR-75), `.md/.markdown/.txt` filter, favourites |
+| `BookIndex` | single-pass file scan: paragraph offsets in an `int[]`, cached in RMS |
+| `TextSource` | reading a chunk of the file at an offset + the UTF-8/CP1251 decoder |
+| `MdParser` | a line → a markup block (h1-h6, list, quote, code, rule, text) |
+| `Layout` | splitting a block into lines by screen width, styles via `Font` |
+| `ReaderCanvas` | full-screen rendering, key handling, auto-scroll |
+| `Settings` | RMS: font, inversion, encoding, auto-scroll speed |
+| `Library` | RMS: reading position and bookmarks per file |
 
-## Разметка (подмножество Markdown)
+## Markup (a Markdown subset)
 
-Поддерживаем: `#`..`######`, `**жирный**`, `*курсив*`, `` `код` ``, ``` блоки кода,
-`> цитата`, списки `-`/`*`/`1.`, `---` (разделитель), `[текст](ссылка)` → показываем текст.
-Не поддерживаем: таблицы (показываем как есть), картинки (подпись), HTML (как текст).
+Supported: `#`..`######`, `**bold**`, `*italic*`, `` `code` ``, fenced code blocks,
+`> quotes`, `-`/`*`/`1.` lists, `---` rules, `[text](link)` → the text is shown.
+Not supported: tables (shown as-is), images (caption only), HTML (as plain text).
 
-## Управление (ReadManiac-подобное)
+## Controls (ReadManiac-style)
 
-- `2`/`8`, вверх/вниз — строка/страница
-- `4`/`6` — глава (следующий заголовок) 
-- `5`/Fire — меню
-- `0` — автопрокрутка вкл/выкл, `1`/`3` — скорость
-- `*` — инверсия цветов, `#` — размер шрифта
-- левая софт-клавиша — меню, правая — назад/выход
+- `2`/`8`, up/down — line / page
+- `4`/`6` — chapter (next heading)
+- `5`/Fire — menu
+- `0` — auto-scroll on/off, `1`/`3` — speed
+- `*` — invert colours, `#` — font size
+- left soft key — menu, right — back / exit
 
-## Сборка
+## Build
 
-`build.bat` → javac (bootclasspath = CLDC+MIDP) → ProGuard `-microedition` (сжатие +
-предверификация) → jar + jad. Результат в `dist/MDReader.jar`.
+`build.bat` → javac (bootclasspath = CLDC+MIDP) → ProGuard `-microedition` (shrinking +
+preverification) → jar + jad. Output in `dist/MDReader.jar`.
 
-## Состояние на 20.09.2026
+## Status as of 2026-09-20
 
-Версия 0.1.0 собирается и проверена в эмуляторе WTK на 240x320 и 176x220:
-обзор карты памяти, чтение, разметка, содержание, переход к проценту, темы,
-размер шрифта, автопрокрутка, сохранение позиции. `dist/MDReader.jar` — 18,8 КБ
-после ProGuard (без него 27 КБ). Установка из `.jad` проверена отдельно.
+Version 0.1.0 builds and was verified in the WTK emulator at 240x320 and 176x220:
+card browsing, reading, markup, table of contents, jump to a percentage, themes, font
+size, auto-scroll, position saving. `dist/MDReader.jar` is 18.8 KB after ProGuard
+(27 KB without it). Installing from the `.jad` was checked separately.
 
-## Проверка на Nokia E90 (21.09.2026)
+## Testing on a Nokia E90 (2026-09-21)
 
-Первый запуск на живом аппарате. Работает: установка из `.jad`, доступ к карте,
-чтение, разметка, кириллица в UTF-8. Нашлись две вещи, которых эмулятор не показывает:
+First run on real hardware. Working: install from the `.jad`, card access, reading,
+markup, Cyrillic in UTF-8. Two things turned up that the emulator does not show:
 
-1. **Дубли дисков в обзоре.** Symbian отдаёт из `listRoots()` на каждый том ДВЕ записи —
-   локализованное имя и букву: «Память тлф/», «C:/», «Карта памяти/», «E:/».
-   Чинится в `Roots.merge`: пара «имя + буква» склеивается в один пункт, подпись берём
-   человеческую, путь — по букве. Есть запасной выход «Все диски» в меню обзора.
-2. **Пустой квадрат в строке состояния** — значок автопрокрутки был символом `▶` (U+25B6),
-   а такого глифа в шрифтах S60/S40 нет. Теперь рисуется `fillTriangle`, без шрифта.
-   По той же причине `Text` больше не подставляет `�` для битых байт, а ставит `?`.
+1. **Duplicate drives in the browser.** Symbian's `listRoots()` returns TWO entries per
+   volume — a localised name and a drive letter: «Память тлф/», «C:/», «Карта памяти/»,
+   «E:/». Fixed in `Roots.merge`: the name+letter pair is merged into one entry, taking
+   the human-readable name as the label and the letter as the path. There is an escape
+   hatch — the "All drives" command in the browser menu.
+2. **An empty box in the status bar** — the auto-scroll marker was the character `▶`
+   (U+25B6), and no such glyph exists in S60/S40 fonts. It is now drawn with
+   `fillTriangle`, independent of the font. For the same reason `Text` no longer
+   substitutes `�` for undecodable bytes and uses `?` instead.
 
-Проверка 0.1.2 на E90 (22.09.2026): дисков в обзоре по одному на том, треугольник
-автопрокрутки рисуется, маркер списков `•` (U+2022) в шрифте аппарата **есть** —
-его менять не нужно.
+Testing 0.1.2 on the E90 (2026-09-22): one browser entry per volume, the auto-scroll
+triangle draws, and the `•` list bullet (U+2022) **does** exist in the device font — it
+does not need changing.
 
-Вывод на будущее: **всё, что рисуем текстом, держим в пределах ASCII + кириллицы**,
-значки — только графикой. `•` — проверенное исключение. Эмулятор WTK использует шрифты настольной Windows
-и такие дыры не ловит в принципе.
+The lesson for the future: **keep everything drawn as text within ASCII + Cyrillic**, and
+draw symbols with graphics. `•` is a verified exception. The WTK emulator uses desktop
+Windows fonts and cannot catch this class of bug at all.
 
-## Что осталось
+## Still to do
 
-1. Проверка на живом железе (5300, NOKLA) — эмулятор врёт про память и шрифты.
-   На E90 всё проверено, см. выше.
-2. Закладки (пока помнится только последняя позиция по каждому файлу).
-3. Поиск по тексту.
-4. Таблицы Markdown — сейчас выводятся как обычный текст.
-5. Блоки кода после перемотки: состояние ``` определяется только в пределах страницы,
-   поэтому прыжок в середину длинного блока кода покажет его как обычный текст.
-6. Возможно — Nokia UI API: держать подсветку экрана при чтении (только для нокий,
-   через рефлексию, чтобы не ломать сборку на других аппаратах).
+1. Testing on more real hardware (5300, NOKLA) — the emulator lies about memory and fonts.
+   The E90 is fully covered, see above.
+2. Bookmarks (only the last position per file is remembered so far).
+3. Full-text search.
+4. Markdown tables — currently rendered as plain text.
+5. Code blocks after seeking: the ``` state is only tracked within a page, so jumping into
+   the middle of a long code block shows it as ordinary text.
+6. Possibly the Nokia UI API: keep the backlight on while reading (Nokia only, via
+   reflection, so the build does not break on other devices).

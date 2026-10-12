@@ -1,54 +1,59 @@
-# История версий
+# Changelog
 
-Собранные пары `.jar` + `.jad` по каждой версии лежат в `dist/versions/`.
-На телефон копируем **оба** файла из нужной версии в одну папку и открываем `.jad`.
+**English** · [Русский](CHANGELOG.ru.md)
 
-Версия правится в `build.bat` (`set VERSION=`) перед сборкой, которая уезжает на аппарат:
-телефон сравнивает `MIDlet-Version` и без изменения номера может не заметить обновления.
-Правило нумерации простое: третья цифра — починки и мелочи, вторая — заметные новые
-возможности.
+Built `.jar` + `.jad` pairs for every version live in `dist/versions/`. To install one,
+copy **both** files of that version into a single folder on the phone and open the `.jad`.
+
+The version is set in `build.bat` (`set VERSION=`) before any build that goes onto a
+device: the phone compares `MIDlet-Version`, and without a bump it may not notice the
+update. Numbering is simple — the third digit is fixes and small things, the second is
+noticeable new capability.
 
 ---
 
-## 0.1.2 — 22.09.2026
+## 0.1.2 — 2026-09-22
 
-- В «О программе» добавлена ссылка на исходники: `github.com/Hinduc0der/mdreader-j2me`.
-- Проект выложен на GitHub под MIT.
+- The About screen now links to the source: `github.com/Hinduc0der/mdreader-j2me`.
+- Project published on GitHub under MIT.
 
-Проверено на Nokia E90: обзор показывает по одному пункту на том, значок автопрокрутки
-рисуется треугольником, маркер списков `•` выводится нормально. То есть обе находки
-версии 0.1.1 закрыты на живом аппарате.
+Verified on a Nokia E90: the browser lists one entry per volume, the auto-scroll marker
+draws as a triangle, and the `•` list bullet renders correctly. Both findings from 0.1.1
+are confirmed fixed on real hardware.
 
-## 0.1.1 — 21.09.2026
+## 0.1.1 — 2026-09-21
 
-Первые правки по итогам проверки на живой Nokia E90.
+First round of fixes from testing on a real Nokia E90.
 
-**Починено**
+**Fixed**
 
-- **Обзор показывал каждый диск дважды.** Symbian отдаёт из `listRoots()` на каждый
-  том две записи — локализованное имя и букву («Память тлф/» и «C:/», «Карта памяти/»
-  и «E:/»). Теперь пара склеивается в один пункт: подпись человеческая, путь — по букве.
-  Логика в `Roots.merge`, проверяется `test/RootsTest.java`.
-- **Пустой квадрат в строке состояния.** Значок автопрокрутки был символом `▶` (U+25B6),
-  которого нет в шрифтах S60 и S40. Рисуется треугольником через `fillTriangle`.
-- Битые байты при перекодировке больше не заменяются на `�` (U+FFFD) — по той же причине,
-  теперь подставляется `?`.
+- **The browser listed every drive twice.** Symbian's `listRoots()` returns two entries
+  per volume — a localised name and a drive letter («Память тлф/» and «C:/», «Карта
+  памяти/» and «E:/»). The pair is now merged into a single entry: the human-readable
+  name as the label, the drive letter as the path. Logic lives in `Roots.merge` and is
+  covered by `test/RootsTest.java`.
+- **An empty box in the status bar.** The auto-scroll marker was the character `▶`
+  (U+25B6), which does not exist in S60 and S40 fonts. It is now drawn with
+  `fillTriangle` instead.
+- Undecodable bytes are no longer replaced with `�` (U+FFFD) for the same reason; `?` is
+  used instead.
 
-**Добавлено**
+**Added**
 
-- В обзоре команда «Все диски» — показать корни без склейки, если она где-то ошибётся.
-  Выбор сохраняется в RMS.
-- В «О программе» — авторство, версия из манифеста и место под ссылку на исходники.
+- An "All drives" command in the browser — show the roots unmerged, in case the merging
+  gets it wrong on some device. The choice is stored in RMS.
+- The About screen now shows authorship, the version from the manifest, and the source link.
 
-**Внутри**
+**Internals**
 
-- Формат записи настроек в RMS поднят до версии 2. Новые поля дописываются в конец,
-  записи версии 1 читаются по-старому — настройки и позиции чтения при обновлении
-  с 0.1.0 не теряются.
+- The RMS settings record format moved to version 2. New fields are appended at the end
+  and version 1 records still read correctly, so settings and reading positions survive
+  the upgrade from 0.1.0.
 
-## 0.1.0 — 20.09.2026
+## 0.1.0 — 2026-09-20
 
-Первая рабочая сборка. Обзор карты памяти через JSR-75, чтение без загрузки файла
-в память (окно 8 КБ), разметка Markdown, содержание по заголовкам, переход к проценту,
-три темы, три размера шрифта, автопрокрутка, свои декодеры UTF-8 и Windows-1251,
-сохранение позиции по каждому файлу. Проверена в эмуляторе WTK на 240x320 и 176x220.
+First working build. Memory-card browsing over JSR-75, reading without loading the file
+into memory (an 8 KB window), Markdown rendering, table of contents from headings, jump
+to a percentage, three themes, three font sizes, auto-scroll, hand-written UTF-8 and
+Windows-1251 decoders, and per-file reading positions. Tested in the WTK emulator at
+240x320 and 176x220.

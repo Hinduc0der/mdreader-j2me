@@ -1,71 +1,73 @@
-# MD Reader — читалка Markdown для кнопочных телефонов
+# MD Reader — a Markdown reader for feature phones
 
-> Замысел, постановка задачи и проверка на живом железе — [@Hinduc0der](https://github.com/Hinduc0der).
-> Код написан Claude (Anthropic) под его руководством.
+**English** · [Русский](README.ru.md)
 
+> Idea, requirements and all testing on real hardware — [@Hinduc0der](https://github.com/Hinduc0der).
+> Code written by Claude (Anthropic) under his direction.
 
-MIDlet под MIDP 2.0 / CLDC 1.1: читает `.md` (а заодно `.txt`) прямо с карты памяти,
-рисует разметку своим кодом. Цель — Nokia 5300 (240x320), Sony Ericsson K750 (176x220)
-и всё остальное, где есть Java и JSR-75. Вёрстка считается от размера экрана,
-поэтому отдельных сборок под разрешения не нужно.
+A MIDlet for MIDP 2.0 / CLDC 1.1 that reads `.md` (and `.txt`) straight off the memory
+card and renders the markup itself. Targets the Nokia 5300 (240x320), Sony Ericsson K750
+(176x220) and anything else with Java and JSR-75. Layout is derived from the screen size,
+so there are no per-resolution builds.
 
-Готовая сборка: `dist/MDReader.jar` + `dist/MDReader.jad`.
+Ready-to-install build: `dist/MDReader.jar` + `dist/MDReader.jad`.
 
-## Как поставить на телефон
+## Installing on a phone
 
-1. Скопировать на карту памяти **оба** файла, `.jar` и `.jad`, в одну папку.
-2. На телефоне открыть `.jad` (на S40 — через «Галерея» / «Приложения»), согласиться на установку.
-3. При первом открытии файла телефон спросит разрешение на доступ к данным —
-   это JSR-75. Чтобы не спрашивал каждый раз, в свойствах приложения поставить
-   «Доступ к данным: спрашивать один раз» (на S40 — *Приложения → Параметры → Доступ к данным*).
+1. Copy **both** files, the `.jar` and the `.jad`, into the same folder on the memory card.
+2. On the phone, open the `.jad` (on S40 — via *Gallery* / *Applications*) and accept the install.
+3. The first time you open a file the phone will ask for permission to access data —
+   that is JSR-75. To stop it asking every time, set the application permission
+   *Data access: ask once* (on S40 — *Applications → Options → Data access*).
 
-MIDlet не подписан, поэтому в правах он «недоверенный» — это нормально,
-просто телефон осторожничает при чтении карты.
+The MIDlet is unsigned, so the phone treats it as untrusted. That is expected; it is
+simply being careful about reading the card.
 
-## Управление
+## Controls
 
-| Клавиша | Действие |
+| Key | Action |
 |---|---|
-| `2` / `8`, вверх / вниз | строка вверх / вниз |
-| `7` / `9` | страница вверх / вниз |
-| `4` / `6` | предыдущий / следующий заголовок |
-| `5`, центр джойстика | меню |
-| `0` | автопрокрутка вкл / выкл |
-| `1` / `3` | медленнее / быстрее |
-| `*` | тема: день → ночь → сепия |
-| `#` | размер шрифта |
-| правая софт-клавиша | закрыть книгу, вернуться в обзор |
+| `2` / `8`, up / down | one line up / down |
+| `7` / `9` | page up / down |
+| `4` / `6` | previous / next heading |
+| `5`, joystick centre | menu |
+| `0` | auto-scroll on / off |
+| `1` / `3` | slower / faster |
+| `*` | theme: day → night → sepia |
+| `#` | font size |
+| right soft key | close the book, back to the browser |
 
-На сенсорных аппаратах: верх экрана — страница назад, низ — вперёд, середина — меню.
+On touch devices: tap the top of the screen for the previous page, the bottom for the
+next one, the middle for the menu.
 
-В меню: содержание (список заголовков файла), переход к проценту, выбор другого
-файла, настройки (шрифт, тема, кодировка, строка состояния, склейка абзацев),
-автопрокрутка.
+The menu has: table of contents (the file's headings), jump to a percentage, open another
+file, settings (font, theme, encoding, status bar, paragraph joining) and auto-scroll.
 
-Позиция чтения и настройки сохраняются в RMS, последние 20 книг помнятся по пути.
-При запуске открывается последняя книга на том месте, где остановились.
+Reading position and settings are stored in RMS; the last 20 books are remembered by path.
+On startup the last book reopens exactly where you stopped.
 
-## Что понимает из Markdown
+## Markdown it understands
 
-Заголовки `#`…`######`, `**жирный**`, `*курсив*`, `` `код` ``, блоки ``` и отступом
-в 4 пробела, цитаты `>`, списки `-`/`*`/`+` и нумерованные, разделители `---`,
-ссылки `[текст](url)` и картинки — показывается подпись. Таблицы и HTML выводятся как
-обычный текст.
+Headings `#`…`######`, `**bold**`, `*italic*`, `` `code` ``, fenced ``` blocks and
+4-space-indented blocks, `>` blockquotes, `-`/`*`/`+` and numbered lists, `---` rules,
+links `[text](url)` and images — the caption is shown. Tables and HTML are rendered as
+plain text.
 
-Кодировка определяется сама (UTF-8 против Windows-1251), в настройках можно задать
-принудительно. Декодер свой: системному на S40 доверять нельзя.
+Encoding is detected automatically (UTF-8 versus Windows-1251) and can be forced in the
+settings. The decoder is hand-written: the system one on S40 cannot be trusted.
 
-## Сборка
+## Building
 
-Нужны JDK 8, WTK 2.5.2 и (для release) ProGuard — пути прописаны в начале `build.bat`.
+You need JDK 8, WTK 2.5.2 and, for a release build, ProGuard. Paths are set at the top
+of `build.bat`.
 
 ```
-build.bat            обычная сборка, классы как есть
-build.bat release    + ProGuard: сжатие и обфускация (примерно вдвое меньше JAR)
+build.bat            plain build, classes as they are
+build.bat release    + ProGuard: shrinking and obfuscation (roughly half the JAR size)
 ```
 
-Результат — `dist/MDReader.jar` и `.jad`: это всегда последняя сборка, она
-перезаписывается. Плюс каждая **release**-сборка кладётся в архив:
+The output is `dist/MDReader.jar` and `.jad` — always the latest build, overwritten every
+time. On top of that, every **release** build is archived:
 
 ```
 dist/versions/MDReader-0.1.0.jar + .jad
@@ -73,51 +75,64 @@ dist/versions/MDReader-0.1.1.jar + .jad
 dist/versions/MDReader-0.1.2.jar + .jad
 ```
 
-У архивной пары `.jad` ссылается на свой `.jar` по имени с версией, поэтому любую
-старую версию можно поставить на телефон, просто скопировав её пару в одну папку.
-Отладочные сборки в архив не попадают — там только то, что уезжало на аппарат.
+In an archived pair the `.jad` points at its own versioned `.jar`, so any old version can
+be installed by copying that pair into one folder. Debug builds are not archived — the
+archive only holds what actually went onto a phone.
 
-Версию бампать в `build.bat` (`set VERSION=`) перед каждой сборкой, которую ставишь
-на телефон: иначе телефон может не заметить обновления, а в архиве затрётся предыдущая
-(сборка об этом предупредит). Что изменилось в каждой версии — в `CHANGELOG.md`.
+Bump the version in `build.bat` (`set VERSION=`) before any build you put on a phone:
+otherwise the phone may not notice the update, and the previous archive entry gets
+overwritten (the build warns about this). What changed in each version is in
+[CHANGELOG.md](CHANGELOG.md).
 
-### Проверка в эмуляторе
+### Running in the emulator
 
 ```
 "C:\WTK2.5.2_01\bin\emulator.exe" -Xdevice:DefaultColorPhone -Xdomain:maximum ^
   -classpath build\pre mdreader.MDReaderMIDlet
 ```
 
-`-Xdevice:DefaultGrayPhone` — экран 176x220, как у K750. Файлы для чтения эмулятор
-берёт из `%USERPROFILE%\j2mewtk\2.5.2\appdb\temp.<устройство>N\filesystem\root1\`
-(при запуске через `-classpath` каталог временный и создаётся заново).
-Для более честной картинки есть KEmulator nnmod в `C:\j2me-tools\kemulator`.
+`-Xdevice:DefaultGrayPhone` gives a 176x220 screen, like the K750. The emulator reads
+files from `%USERPROFILE%\j2mewtk\2.5.2\appdb\temp.<device>N\filesystem\root1\` (launched
+via `-classpath` that directory is temporary and recreated each run). For a more honest
+picture, KEmulator nnmod works too.
 
-## Устройство кода
+Be warned: the emulator uses desktop Windows fonts and lies about memory. Two bugs in
+0.1.1 were invisible there and only showed up on a real Nokia.
 
-| Файл | Ответственность |
+## How the code is laid out
+
+| File | Responsibility |
 |---|---|
-| `MDReaderMIDlet` | запуск, меню, настройки, содержание |
-| `FileBrowser` | обзор карты памяти через JSR-75 |
-| `Book` | файл: окно чтения 8 КБ, логические строки по байтовым смещениям |
-| `Text` | свои декодеры UTF-8 и Windows-1251, автоопределение |
-| `MdParser` / `MdBlock` | строка Markdown → блок с посимвольными стилями |
-| `ReaderCanvas` | разметка по ширине экрана, рисование, клавиши, автопрокрутка |
-| `Settings` | RMS: настройки и позиции чтения |
+| `MDReaderMIDlet` | startup, menu, settings, table of contents |
+| `FileBrowser` | browsing the memory card over JSR-75 |
+| `Roots` | merging the duplicate filesystem roots Symbian reports |
+| `Book` | the file: an 8 KB reading window, logical lines by byte offset |
+| `Text` | hand-written UTF-8 and Windows-1251 decoders, auto-detection |
+| `MdParser` / `MdBlock` | a Markdown line → a block with per-character styles |
+| `ReaderCanvas` | wrapping to screen width, drawing, keys, auto-scroll |
+| `Settings` | RMS: settings and reading positions |
 
-Файл целиком в память не читается никогда: страница задаётся парой
-«смещение строки + номер визуальной строки внутри неё», а `Book` держит окно в 8 КБ.
-На K750 с её мегабайтом кучи это принципиально.
+The file is never read into memory as a whole: a page is identified by a pair of
+«line offset + visual line number inside it», and `Book` keeps an 8 KB window. On a K750
+with its one megabyte of heap that is not optional.
 
-## Лицензия
+`test/RootsTest.java` runs on desktop Java and covers the root-merging logic:
 
-MIT, см. [LICENSE](LICENSE).
+```
+javac -d build\test src\mdreader\Roots.java test\RootsTest.java
+java -cp build\test RootsTest
+```
 
-## Как это делалось
+## Licence
 
-Вся разработка шла диалогом: человек ставит задачу, задаёт рамки (целевые аппараты,
-ограничения по памяти, ориентир на старый ReadManiac) и проверяет сборки на живых
-телефонах; код, сборку и разбор находок делает Claude. Некоторые вещи иначе и не
-всплыли бы — например, Symbian показывал каждый диск в обзоре дважды, а значок
-автопрокрутки рисовался пустым квадратом: эмулятор ни то, ни другое не воспроизводит,
-это видно только на настоящей Nokia. История таких находок — в [CHANGELOG.md](CHANGELOG.md).
+MIT, see [LICENSE](LICENSE).
+
+## How this was made
+
+The whole thing was built through conversation: a human sets the task, defines the
+constraints (target devices, memory limits, the old ReadManiac as the reference point)
+and tests the builds on real phones; Claude writes the code, drives the build and works
+out what the findings mean. Some things would never have surfaced otherwise — Symbian
+listed every drive twice in the file browser, and the auto-scroll marker rendered as an
+empty box. The emulator reproduces neither; both are only visible on an actual Nokia.
+The log of those findings is in [CHANGELOG.md](CHANGELOG.md).
